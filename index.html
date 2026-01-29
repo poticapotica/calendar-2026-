@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="sl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1220" />
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <title>Študijski koledar</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <!-- WELCOME -->
+    <section id="screen-welcome" class="screen screen--active" aria-label="Pozdrav">
+      <div class="card hero">
+        <div class="hero__media">
+          <img id="heroImage" alt="Naključna slika" />
+          <div class="hero__overlay"></div>
+        </div>
+
+        <div class="hero__content">
+          <h1>Dobrodošel v študijskem koledarju</h1>
+          <p>
+            Tukaj hitro označiš izpite, seminarske naloge, domače naloge, predstavitve …
+            Vse se shrani na tvoji napravi.
+          </p>
+
+          <button id="btnGoCalendar" class="btn btn--primary">
+            Odpri koledar
+          </button>
+
+          <p class="muted small">
+            Namig: na telefonu odpri stran v brskalniku in izberi “Add to Home Screen”, da deluje kot aplikacija.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section id="screen-calendar" class="screen" aria-label="Koledar">
+      <header class="topbar">
+        <button id="btnBack" class="btn btn--ghost" aria-label="Nazaj">←</button>
+
+        <div class="topbar__title">
+          <h2 id="monthLabel">Mesec</h2>
+          <div class="topbar__sub muted small" id="todayLabel"></div>
+        </div>
+
+        <button id="btnAddTop" class="btn btn--primary">+ Dodaj</button>
+      </header>
+
+      <div class="layout">
+        <!-- LEFT COLUMN -->
+        <div class="leftcol">
+          <div class="card upcoming">
+            <div class="upcoming__head">
+              <h3>Prihajajoče</h3>
+              <div class="muted small">Naslednji roki</div>
+            </div>
+            <div id="upcomingList" class="upcoming__list">
+              <div class="empty muted">Ni prihodnjih dogodkov.</div>
+            </div>
+          </div>
+
+          <div class="card calendar">
+            <div class="calendar__nav">
+              <button id="btnPrev" class="btn btn--ghost" aria-label="Prejšnji mesec">‹</button>
+              <div class="calendar__hint muted small">Tapni dan za ogled dogodkov</div>
+              <button id="btnNext" class="btn btn--ghost" aria-label="Naslednji mesec">›</button>
+            </div>
+
+            <div class="dow" aria-hidden="true">
+              <div>Pon</div><div>Tor</div><div>Sre</div><div>Čet</div><div>Pet</div><div>Sob</div><div>Ned</div>
+            </div>
+
+            <div id="grid" class="grid" role="grid" aria-label="Mesečni koledar"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <aside class="card side">
+          <div class="side__head">
+            <div>
+              <h3 id="selectedDateTitle">Izberi dan</h3>
+              <div class="muted small" id="selectedDateSub">—</div>
+            </div>
+            <button id="btnAddSide" class="btn btn--primary btn--small">+ Dodaj</button>
+          </div>
+
+          <div id="eventsList" class="events">
+            <div class="empty muted">Ni dogodkov.</div>
+          </div>
+
+          <div class="backup">
+            <button id="btnExport" class="btn btn--ghost btn--small">Izvozi backup</button>
+
+            <label class="btn btn--ghost btn--small backup__label">
+              Uvozi backup
+              <input id="fileImport" type="file" accept="application/json">
+            </label>
+          </div>
+
+          <div class="side__foot muted small">
+            Vse se samodejno shrani (LocalStorage). Backup ti pomaga za prenos na drugo napravo.
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: ADD EVENT -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close="1"></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal__header">
+        <h3 id="modalTitle">Dodaj dogodek</h3>
+        <button class="btn btn--ghost" data-close="1" aria-label="Zapri">✕</button>
+      </div>
+
+      <form id="eventForm" class="form">
+        <label>
+          <span>Datum</span>
+          <input id="fDate" type="date" required />
+        </label>
+
+        <label>
+          <span>Naziv</span>
+          <input id="fTitle" type="text" placeholder="npr. Makroekonomija – izpit" required />
+        </label>
+
+        <label>
+          <span>Tip</span>
+          <select id="fType">
+            <option value="Izpit">Izpit</option>
+            <option value="Kolokvij">Kolokvij</option>
+            <option value="Seminarska naloga">Seminarska naloga</option>
+            <option value="Domača naloga">Domača naloga</option>
+            <option value="Predstavitev">Predstavitev</option>
+            <option value="Drugo">Drugo</option>
+          </select>
+        </label>
+
+        <div class="row2">
+          <label>
+            <span>Barva</span>
+            <input id="fColor" type="color" value="#5b8cff" />
+          </label>
+
+          <label>
+            <span>Simbol</span>
+            <select id="fIcon">
+              <option value="📝">📝</option>
+              <option value="📚">📚</option>
+              <option value="📌">📌</option>
+              <option value="✅">✅</option>
+              <option value="🧠">🧠</option>
+              <option value="🎤">🎤</option>
+              <option value="⏳">⏳</option>
+              <option value="⚡">⚡</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          <span>Opomba (neobvezno)</span>
+          <textarea id="fNote" rows="3" placeholder="npr. učna snov: poglavja 1–5"></textarea>
+        </label>
+
+        <div class="form__actions">
+          <button type="button" class="btn btn--ghost" data-close="1">Prekliči</button>
+          <button type="submit" class="btn btn--primary">Shrani</button>
+        </div>
+
+        <p class="muted small">
+          * Podatki se shranijo samo v tvojem brskalniku (LocalStorage).
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
