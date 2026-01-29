@@ -1,4 +1,4 @@
-const CACHE_NAME = "studijski-koledar-v1";
+const CACHE_NAME = "studijski-koledar-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -30,3 +30,4 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   event.respondWith(caches.match(event.request).then((c) => c || fetch(event.request)));
 });
+
